@@ -10,25 +10,26 @@ const ThoughtForm = () => {
 
   const [addThought, { error }] = useMutation(ADD_THOUGHT, {
     update(cache, { data: { addThought } }) {
-      try {
-        // update thought array's cache
+      
         // could potentially not exist yet, so wrap in a try/catch
-        const { thoughts } = cache.readQuery({ query: QUERY_THOUGHTS });
+      try {
+        // update me array's cache
+        const { me } = cache.readQuery({ query: QUERY_ME });
         cache.writeQuery({
-          query: QUERY_THOUGHTS,
-          data: { thoughts: [addThought, ...thoughts] },
+          query: QUERY_ME,
+          data: { me: { ...me, thoughts: [...me.thoughts, addThought] } },
         });
       } catch (e) {
-        console.error(e);
+        console.warn("First thought insertion by user!")
       }
 
-      // update me object's cache
-      const { me } = cache.readQuery({ query: QUERY_ME });
+      // update thought array's cache
+      const { thoughts } = cache.readQuery({ query: QUERY_THOUGHTS });
       cache.writeQuery({
-        query: QUERY_ME,
-        data: { me: { ...me, thoughts: [...me.thoughts, addThought] } },
+        query: QUERY_THOUGHTS,
+        data: { thoughts: [addThought, ...thoughts] },
       });
-    },
+    }
   });
 
   // update state based on form input changes
